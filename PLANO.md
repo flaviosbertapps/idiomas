@@ -2,6 +2,14 @@
 
 > Status: planejamento. Nada construído ainda. Idioma inicial: italiano (`it`). Tudo parametrizado por `language_code`.
 
+## Decisões tomadas
+- **Público:** uso pessoal na validação; arquitetura preparada para multiusuário e monetização futura (auth, isolamento por usuário, limites de uso desde o início — barato de fazer agora, caro de adaptar depois).
+- **Plataforma:** página web (PWA) com notificação push na validação; app nativo depois, **só se a PWA se mostrar insuficiente**.
+  - Atenção: no iPhone, push em PWA só funciona com o site adicionado à tela inicial (iOS 16.4+). Se seu celular é iPhone, isso precisa ser testado na Etapa 0/3.
+  - Para não reescrever na migração: lógica toda no backend (API), frontend fino. Um app nativo futuro (ex.: React Native/Expo) reusa a mesma API; push migra de Web Push para FCM/APNs.
+- **LGPD/privacidade:** baixa prioridade enquanto for pessoal; obrigatória antes de abrir para terceiros (Etapa 5). Isso também reduz o peso do contra de privacidade da DeepSeek na fase de validação.
+- **Assuntos:** lista inicial na seção 3.1.
+
 ---
 
 ## 1. Crítica da ideia (antes de planejar)
@@ -72,6 +80,27 @@ Risco de repetição e de assuntos rasos. Cada mensagem inicial precisa de um **
 - Custo real: os tokens extras do trecho no prompt (~300–800 tokens). Mandar só o resumo (`/page/summary`), não o artigo inteiro.
 
 **Memória do modelo** é "grátis" em tokens, mas repete assuntos, alucina e não traz nada atual. Usar só como fallback se a Wikipedia falhar.
+
+### 3.1 Lista inicial de assuntos
+
+Cada assunto mapeia para categorias da it.wikipedia (nomes a validar na API na Etapa 0 — categorias mudam). O usuário escolhe vários; o sistema alterna para evitar repetição.
+
+| Chave | Assunto (UI) | Categorias it.wikipedia (ponto de partida) | Observação |
+|---|---|---|---|
+| `storia_antica` | História antiga | `Storia romana`, `Antica Grecia`, `Antico Egitto`, `Etruschi`, `Civiltà mesopotamiche` | Prioritário. Roma é natural para italiano; vocabulário rico, mas cuidado com nível A1–A2 (simplificar). |
+| `storia_italia` | História da Itália | `Storia d'Italia`, `Rinascimento`, `Risorgimento` | Medieval, Renascimento, unificação. |
+| `arte` | Arte e arquitetura | `Pittori italiani`, `Architettura romana`, `Musei d'Italia` | |
+| `cucina` | Culinária | `Cucina italiana`, `Piatti regionali` | Ótimo para iniciantes: vocabulário concreto. |
+| `geografia` | Cidades e regiões | `Regioni d'Italia`, `Città d'Italia` | Bom para planejar viagens. |
+| `viaggi` | Viagem e cotidiano | (memória do modelo; situações práticas) | Diálogos úteis: hotel, restaurante, trem. Wikipedia ajuda pouco aqui. |
+| `cinema_musica` | Cinema e música | `Film italiani`, `Cantanti italiani`, `Opera lirica` | |
+| `scienza` | Ciência e invenções | `Scienziati italiani`, `Invenzioni` | Galileu, Volta, Marconi. |
+| `mitologia` | Mitologia greco-romana | `Mitologia romana`, `Mitologia greca` | Complementa história antiga; ótimas narrativas. |
+| `letteratura` | Literatura | `Scrittori italiani`, `Divina Commedia` | Mais indicado a partir de B1. |
+| `sport` | Esporte | `Calcio in Italia`, `Ciclismo` | |
+| `attualita` | Atualidades | (RSS de notícias, futuro) | Fora do MVP; depende de fonte com termos de uso compatíveis. |
+
+Ganchos para variedade: `/feed/onthisday` ("neste dia na história") encaixa muito bem com história antiga/italiana.
 
 Mapeamento: cada interesse do usuário → lista de categorias da Wikipedia por idioma (ex.: `cucina` → `Categoria:Cucina italiana`). Esse mapeamento fica em arquivo de configuração por idioma.
 

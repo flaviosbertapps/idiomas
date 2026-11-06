@@ -1,0 +1,40 @@
+{
+  "code": "it",
+  "nome": "italiano",
+  "nome_nativo": "italiano",
+  "wikipedia": "it",
+  "idioma_nativo_usuario": "português do Brasil",
+  "categorias_erro": [
+    "ausiliare (essere/avere)",
+    "articolo",
+    "genere/concordanza",
+    "preposizione articolata",
+    "tempo verbale (passato prossimo/imperfetto)",
+    "congiuntivo/condizionale",
+    "piacere",
+    "falso amico / portoghesismo",
+    "ortografia",
+    "lessico"
+  ],
+  "niveis": {
+    "A1": "Frasi brevissime, presente indicativo, vocabolario quotidiano di base, nessuna subordinata.",
+    "A2": "Frasi brevi, presente e passato prossimo, connettivi semplici (e, ma, perché), lessico concreto.",
+    "B1": "Imperfetto vs passato prossimo, futuro, subordinate semplici, lessico su argomenti familiari.",
+    "B2": "Congiuntivo, condizionale, periodo ipotetico, lessico astratto, registro variabile.",
+    "C1": "Testo ricco e idiomatico, passato remoto in narrazione, sfumature di registro.",
+    "C2": "Lingua colta e letteraria, nessuna semplificazione."
+  },
+  "assuntos": {
+    "storia_antica": { "nome": "História antiga", "categorias": ["Categoria:Storia romana", "Categoria:Antica Grecia", "Categoria:Antico Egitto", "Categoria:Etruschi", "Categoria:Mesopotamia"] },
+    "mitologia": { "nome": "Mitologia greco-romana", "categorias": ["Categoria:Mitologia romana", "Categoria:Mitologia greca"] },
+    "storia_italia": { "nome": "História da Itália", "categorias": ["Categoria:Storia d'Italia", "Categoria:Rinascimento", "Categoria:Risorgimento"] },
+    "arte": { "nome": "Arte e arquitetura", "categorias": ["Categoria:Pittori italiani", "Categoria:Architettura romana"] },
+    "cucina": { "nome": "Culinária", "categorias": ["Categoria:Cucina italiana"] },
+    "geografia": { "nome": "Cidades e regiões", "categorias": ["Categoria:Regioni d'Italia", "Categoria:Città d'Italia"] },
+    "cinema_musica": { "nome": "Cinema e música", "categorias": ["Categoria:Film italiani", "Categoria:Cantanti italiani", "Categoria:Opera lirica"] },
+    "scienza": { "nome": "Ciência e invenções", "categorias": ["Categoria:Scienziati italiani"] },
+    "letteratura": { "nome": "Literatura", "categorias": ["Categoria:Scrittori italiani"] },
+    "sport": { "nome": "Esporte", "categorias": ["Categoria:Calcio in Italia", "Categoria:Ciclismo"] },
+    "viaggi": { "nome": "Viagem e cotidiano", "categorias": [] }
+  }
+}

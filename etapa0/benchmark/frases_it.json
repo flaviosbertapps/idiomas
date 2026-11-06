@@ -1,0 +1,37 @@
+[
+  {"id": 1,  "tipo": "erro", "frase": "Ieri ho andato al mercato con mia sorella.", "esperado": "sono andato", "nota": "ausiliare essere com andare"},
+  {"id": 2,  "tipo": "erro", "frase": "La problema è molto difficile da risolvere.", "esperado": "il problema", "nota": "gênero: problema é masculino"},
+  {"id": 3,  "tipo": "erro", "frase": "Domani vado a la stazione presto.", "esperado": "alla stazione", "nota": "preposição articulada"},
+  {"id": 4,  "tipo": "erro", "frase": "Mi piacciono il caffè italiano.", "esperado": "mi piace", "nota": "concordância de piacere"},
+  {"id": 5,  "tipo": "erro", "frase": "Gli romani hanno costruito molte strade.", "esperado": "i romani", "nota": "artigo i/gli"},
+  {"id": 6,  "tipo": "erro", "frase": "Ho visto una film molto interessante.", "esperado": "un film", "nota": "gênero de film"},
+  {"id": 7,  "tipo": "erro", "frase": "Mia sorella è più alta che me.", "esperado": "di me", "nota": "comparativo com pronome"},
+  {"id": 8,  "tipo": "erro", "frase": "La prossima settimana vado in Roma.", "esperado": "a roma", "nota": "preposição com cidade"},
+  {"id": 9,  "tipo": "erro", "frase": "Quando ero bambino, ho giocato a calcio ogni giorno.", "esperado": "giocavo", "nota": "imperfetto para hábito"},
+  {"id": 10, "tipo": "erro", "frase": "In piazza ci sono molto persone.", "esperado": "molte persone", "nota": "concordância de molto"},
+  {"id": 11, "tipo": "erro", "frase": "Ieri sera ho mangiato troppo pizza.", "esperado": "troppa pizza", "nota": "concordância de troppo"},
+  {"id": 12, "tipo": "erro", "frase": "Le ragazze sono andati al cinema.", "esperado": "andate", "nota": "concordância do particípio"},
+  {"id": 13, "tipo": "erro", "frase": "Questo libro è molto bonito.", "esperado": "bello", "nota": "portuguesismo"},
+  {"id": 14, "tipo": "erro", "frase": "Ho comprato un zaino nuovo.", "esperado": "uno zaino", "nota": "uno antes de z"},
+  {"id": 15, "tipo": "erro", "frase": "Se avrei più tempo, studierei di più.", "esperado": "se avessi", "nota": "período hipotético"},
+  {"id": 16, "tipo": "erro", "frase": "Sto leggendo un libro su la storia di Roma.", "esperado": "sulla storia", "nota": "preposição articulada"},
+  {"id": 17, "tipo": "erro", "frase": "Ho conosciuto mia moglie in 2010.", "esperado": "nel 2010", "nota": "preposição com ano"},
+  {"id": 18, "tipo": "erro", "frase": "Le piramidi sono stati costruiti dagli egiziani.", "esperado": "sono state costruite", "nota": "concordância na passiva"},
+  {"id": 19, "tipo": "erro", "frase": "Io ho 30 anni e lavoro come ingenere.", "esperado": "ingegnere", "nota": "ortografia"},
+  {"id": 20, "tipo": "erro", "frase": "Penso che Giulio Cesare era un grande generale.", "esperado": "fosse", "nota": "congiuntivo após penso che (no falado o indicativo é tolerado; observe como o modelo trata)"},
+
+  {"id": 21, "tipo": "correta", "frase": "Sono stato a Firenze per la prima volta l'anno scorso."},
+  {"id": 22, "tipo": "correta", "frase": "Cesare è stato ucciso nel 44 a.C."},
+  {"id": 23, "tipo": "correta", "frase": "Ho bisogno di comprare uno zaino per il viaggio."},
+  {"id": 24, "tipo": "correta", "frase": "Mi sono svegliato alle sette e poi ho fatto colazione."},
+  {"id": 25, "tipo": "correta", "frase": "Atene era una città molto potente nel quinto secolo avanti Cristo."},
+  {"id": 26, "tipo": "correta", "frase": "Io ho visitato il Colosseo due anni fa.", "nota": "pronome sujeito redundante NÃO é erro"},
+  {"id": 27, "tipo": "correta", "frase": "Non ho niente da fare stasera."},
+  {"id": 28, "tipo": "correta", "frase": "Gli antichi egizi credevano in molti dèi."},
+  {"id": 29, "tipo": "correta", "frase": "Oggi fa molto caldo, quindi è meglio restare a casa."},
+
+  {"id": 30, "tipo": "naturalidade", "frase": "Gli etruschi vivevano nella Toscana prima dei romani.", "esperado": "in toscana", "nota": "aceitável, mas 'in Toscana' é o natural; não deveria ser marcado como erro grave"},
+
+  {"id": 31, "tipo": "portugues", "frase": "Eu não entendi muito bem a pergunta.", "esperado": "non ho capito", "nota": "deve detectar pt e mostrar como dizer em italiano"},
+  {"id": 32, "tipo": "portugues", "frase": "Eu acho que os romanos eram muito organizados.", "esperado": "romani", "nota": "idem"}
+]

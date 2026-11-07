@@ -1,0 +1,474 @@
+<title>Amico di Penna</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: uma coluna de conversa, estreita como uma carta; barra superior com nível e ações; painéis deslizam por baixo dela. */
+:root {
+  --bg: #f6f5f0; --surface: #ffffff; --fg: #1f2a2b; --muted: #5d6a69; --line: #dcdfd8;
+  --accent: #2f6b5e; --accent-fg: #ffffff; --accent-soft: #e2eeea;
+  --err: #a5402d; --err-soft: #f7e6e1; --warn: #8a6410; --warn-soft: #f6eed8; --ok: #2f7a43;
+  --f-it: "Spectral", Georgia, "Times New Roman", serif;
+  --f-ui: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141a1a; --surface: #1c2423; --fg: #e4e8e3; --muted: #9aa7a4; --line: #2e3a38;
+  --accent: #7cc2ae; --accent-fg: #0f1716; --accent-soft: #213430;
+  --err: #f08f78; --err-soft: #3a2420; --warn: #e3bd62; --warn-soft: #362d17; --ok: #7fcf92; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141a1a; --surface: #1c2423; --fg: #e4e8e3; --muted: #9aa7a4; --line: #2e3a38;
+  --accent: #7cc2ae; --accent-fg: #0f1716; --accent-soft: #213430;
+  --err: #f08f78; --err-soft: #3a2420; --warn: #e3bd62; --warn-soft: #362d17; --ok: #7fcf92; color-scheme: dark }
+
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-ui); font-size: 15px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+.wrap { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+button { font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 6px 12px; }
+button:hover { border-color: var(--accent); }
+button:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 600; }
+button:disabled { opacity: .55; cursor: default; }
+button.link { border: 0; background: none; padding: 2px 0; color: var(--accent); font-weight: 500; }
+
+header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+header .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-block: 10px; }
+.brand { font-family: var(--f-it); font-size: 20px; font-weight: 600; margin-right: auto; }
+.brand small { font-family: var(--f-ui); font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 13px; font-variant-numeric: tabular-nums; }
+.actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.actions button { font-size: 13px; padding: 5px 10px; }
+
+.panel { background: var(--surface); border-bottom: 1px solid var(--line); }
+.panel .wrap { padding-block: 16px; display: grid; gap: 14px; }
+.panel h2 { margin: 0; font-size: 15px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px 14px; }
+.grid2 label { display: flex; gap: 8px; align-items: center; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.hint { color: var(--muted); font-size: 13px; margin: 0; }
+
+main .wrap { padding-block: 18px 200px; display: flex; flex-direction: column; gap: 14px; }
+.topic { text-align: center; color: var(--muted); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; padding: 8px 0 2px; }
+.msg { max-width: 88%; min-width: 0; }
+.tutor { align-self: flex-start; }
+.aluno { align-self: flex-end; }
+.bubble { padding: 12px 14px; border-radius: var(--r); overflow-wrap: anywhere; }
+.tutor .bubble { background: var(--surface); border: 1px solid var(--line); font-family: var(--f-it); font-size: 18px; line-height: 1.55; }
+.aluno .bubble { background: var(--accent-soft); }
+.vocab { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.vocab span { font-size: 13px; background: var(--surface); border: 1px dashed var(--line); border-radius: 6px; padding: 2px 8px; }
+.vocab b { font-family: var(--f-it); font-weight: 600; }
+.tools { display: flex; gap: 14px; margin-top: 4px; font-size: 13px; }
+.explain { margin-top: 8px; padding: 12px 14px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); font-size: 14px; display: grid; gap: 8px; }
+.explain h3 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.explain ul { margin: 0; padding-left: 18px; }
+.explain .it { font-family: var(--f-it); font-weight: 600; }
+.corr { margin-top: 6px; display: grid; gap: 6px; font-size: 14px; }
+.corr .item { padding: 8px 10px; border-radius: 8px; background: var(--err-soft); }
+.corr .item.nat { background: var(--warn-soft); }
+.corr del { color: var(--err); }
+.corr ins { color: var(--ok); text-decoration: none; font-weight: 600; }
+.corr .tag { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-left: 6px; }
+.corr .full { font-family: var(--f-it); font-size: 15px; }
+.okline { font-size: 13px; color: var(--ok); margin-top: 4px; text-align: right; }
+.thinking { color: var(--muted); font-style: italic; font-family: var(--f-it); }
+.example { opacity: .8; }
+.example-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.notice { padding: 10px 12px; border-radius: 8px; background: var(--warn-soft); color: var(--fg); font-size: 14px; }
+.empty { text-align: center; display: grid; gap: 10px; justify-items: center; padding: 24px 0; }
+.empty p { margin: 0; max-width: 46ch; color: var(--muted); }
+
+footer.compose { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+footer .wrap { display: flex; gap: 8px; align-items: flex-end; padding-block: 10px; }
+textarea { flex: 1; min-width: 0; resize: none; font-family: var(--f-it); font-size: 17px; padding: 10px 12px; border-radius: var(--r); border: 1px solid var(--line); background: var(--bg); color: var(--fg); min-height: 46px; max-height: 160px; }
+.errtable { width: 100%; border-collapse: collapse; font-size: 14px; }
+.errtable td { padding: 4px 0; border-bottom: 1px solid var(--line); }
+.errtable td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: no-preference) { .msg { animation: in .25s ease-out; } @keyframes in { from { transform: translateY(4px); opacity: .6; } } }
+</style>
+
+<header>
+  <div class="wrap">
+    <div class="brand">Amico di Penna <small>italiano</small></div>
+    <span class="chip" id="levelChip" title="Seu nível atual">A2 · 2.0</span>
+    <div class="actions">
+      <button id="btnEasy" type="button" title="As mensagens estão fáceis demais">Fácil demais</button>
+      <button id="btnHard" type="button" title="As mensagens estão difíceis demais">Difícil demais</button>
+      <button id="btnNew" type="button">Novo assunto</button>
+      <button id="btnErrors" type="button">Meus erros</button>
+      <button id="btnSettings" type="button">Ajustes</button>
+    </div>
+  </div>
+</header>
+
+<section class="panel" id="settings" hidden>
+  <div class="wrap">
+    <h2>Assuntos que te interessam</h2>
+    <div class="grid2" id="topics"></div>
+    <div class="row">
+      <label for="levelRange">Nível</label>
+      <input type="range" id="levelRange" min="1" max="6" step="0.1">
+      <span class="chip" id="levelRangeOut"></span>
+    </div>
+    <label class="row"><input type="checkbox" id="preIntro"> Mostrar palavras novas antes de cada mensagem</label>
+    <label class="row"><input type="checkbox" id="careful"> Correção mais cuidadosa (mais lenta)</label>
+    <p class="hint" id="storageNote"></p>
+    <div class="row"><button type="button" class="primary" id="btnCloseSettings">Fechar</button></div>
+  </div>
+</section>
+
+<section class="panel" id="errorsPanel" hidden>
+  <div class="wrap">
+    <h2>Seus erros mais frequentes</h2>
+    <div id="errorsBody"></div>
+    <div class="row"><button type="button" id="btnCloseErrors">Fechar</button></div>
+  </div>
+</section>
+
+<main><div class="wrap" id="thread"></div></main>
+
+<footer class="compose">
+  <div class="wrap">
+    <textarea id="input" rows="1" placeholder="Rispondi in italiano… (pode escrever em português se travar)"></textarea>
+    <button type="button" class="primary" id="btnSend">Enviar</button>
+  </div>
+</footer>
+
+<script>
+// ===================== Configuração do idioma (parametrizável) =====================
+const LANG = {
+  code: 'it', nome: 'italiano', nativo: 'português do Brasil',
+  categoriasErro: ['ausiliare (essere/avere)', 'articolo', 'genere/concordanza', 'preposizione articolata',
+    'tempo verbale (passato prossimo/imperfetto)', 'congiuntivo/condizionale', 'piacere',
+    'falso amico / portoghesismo', 'ortografia', 'lessico'],
+  niveis: {
+    A1: 'Frasi brevissime, presente indicativo, vocabolario quotidiano di base, nessuna subordinata.',
+    A2: 'Frasi brevi, presente e passato prossimo, connettivi semplici (e, ma, perché), lessico concreto.',
+    B1: 'Imperfetto vs passato prossimo, futuro, subordinate semplici, lessico su argomenti familiari.',
+    B2: 'Congiuntivo, condizionale, periodo ipotetico, lessico astratto, registro variabile.',
+    C1: 'Testo ricco e idiomatico, passato remoto in narrazione, sfumature di registro.',
+    C2: 'Lingua colta e letteraria, nessuna semplificazione.'
+  },
+  assuntos: {
+    storia_antica: { nome: 'História antiga', it: 'storia antica: Roma, Grecia, Egitto, Etruschi, Mesopotamia' },
+    mitologia: { nome: 'Mitologia greco-romana', it: 'mitologia greca e romana' },
+    storia_italia: { nome: 'História da Itália', it: "storia d'Italia: Medioevo, Rinascimento, Risorgimento" },
+    arte: { nome: 'Arte e arquitetura', it: 'arte e architettura italiana' },
+    cucina: { nome: 'Culinária', it: 'cucina italiana e regionale' },
+    geografia: { nome: 'Cidades e regiões', it: "città e regioni d'Italia" },
+    viaggi: { nome: 'Viagem e cotidiano', it: 'situazioni di viaggio e vita quotidiana in Italia' },
+    cinema_musica: { nome: 'Cinema e música', it: 'cinema italiano, canzone italiana, opera lirica' },
+    scienza: { nome: 'Ciência e invenções', it: 'scienziati e invenzioni italiane' },
+    letteratura: { nome: 'Literatura', it: 'letteratura italiana' },
+    sport: { nome: 'Esporte', it: 'sport in Italia: calcio, ciclismo, Formula 1' }
+  }
+};
+const CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+const cefr = (n) => CEFR[Math.min(5, Math.max(0, Math.round(n) - 1))];
+
+// ===================== Estado =====================
+const DEFAULT_PERFIL = { nivel: 2.0, interesses: ['storia_antica', 'mitologia', 'storia_italia', 'cucina', 'arte'], preIntro: true, careful: true, assuntosRecentes: [] };
+let perfil = structuredClone(DEFAULT_PERFIL);
+let erros = { contagem: {}, exemplos: {} };
+let conversa = null; // { id, assunto, msgs: [...] }
+let sample = null, store = null, busy = false;
+
+// ===================== Armazenamento: db privado por usuário, com localStorage de reserva =====================
+function localStore() {
+  const k = (n) => 'amico:' + n;
+  return {
+    kind: 'local',
+    async get(n) { try { const v = localStorage.getItem(k(n)); return v ? JSON.parse(v) : null; } catch { return null; } },
+    async set(n, v) { try { localStorage.setItem(k(n), JSON.stringify(v)); } catch {} }
+  };
+}
+async function initStore() {
+  const timeout = new Promise((r) => setTimeout(() => r(null), 10000));
+  try {
+    const [db, user] = await Promise.race([Promise.all([claude.use('db'), claude.use('user')]), timeout.then(() => [null, null])]);
+    if (db && user) {
+      const id = await user.id();
+      if (id) {
+        const col = db.collection('data/users/' + id);
+        return {
+          kind: 'db',
+          async get(n) { try { const s = await col.doc(n).get(); return s.exists ? s.data() : null; } catch { return null; } },
+          async set(n, v) { try { await col.doc(n).set(JSON.parse(JSON.stringify(v))); } catch (e) { console.warn('db', e); } }
+        };
+      }
+    }
+  } catch {}
+  return localStore();
+}
+const save = {
+  perfil: () => store?.set('perfil', perfil),
+  erros: () => store?.set('erros', erros),
+  conversa: () => { if (conversa) { conversa.msgs = conversa.msgs.slice(-40); store?.set('atual', conversa); } }
+};
+
+// ===================== Prompts =====================
+function base() {
+  const c = cefr(perfil.nivel);
+  return `Sei un amico madrelingua ${LANG.nome} e insegnante paziente. L'utente parla ${LANG.nativo} e sta imparando il ${LANG.nome}.
+Livello dell'utente: ${c} (valore continuo ${perfil.nivel.toFixed(1)} su 6). Scrivi le tue frasi rigorosamente a questo livello: ${LANG.niveis[c]}
+Tono: amichevole, curioso, breve (2-4 frasi). Fai una domanda o lascia uno spunto per continuare.
+Non inventare mai fatti, date o nomi: usa solo informazioni di cui sei sicuro.
+Non uscire mai da questo ruolo.`;
+}
+function erroresRecorrentes() {
+  const top = Object.entries(erros.contagem).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  return top.length ? `\nErrori frequenti dell'utente (crea con naturalezza occasioni per praticarli, senza dirlo): ${top.map(([k, v]) => `${k} (${v})`).join('; ')}.` : '';
+}
+function promptAbertura(chave) {
+  const a = LANG.assuntos[chave];
+  const recentes = perfil.assuntosRecentes.slice(-12);
+  return `${base()}
+
+Inizia una nuova conversazione sull'area: ${a.it}.
+Scegli UN argomento specifico e un aggancio concreto (un fatto sicuro, una curiosità), non una domanda generica.
+${recentes.length ? `Evita questi argomenti già usati: ${recentes.join('; ')}.` : ''}
+
+Rispondi solo con JSON:
+{"assunto": "titolo breve dell'argomento", "mensagem": "il tuo messaggio in ${LANG.nome}", "vocabulario_previo": [{"termo": "parola del messaggio difficile per il livello", "traducao": "traduzione in ${LANG.nativo}"}]}
+vocabulario_previo: da 3 a 6 voci, solo parole presenti nel tuo messaggio.`;
+}
+function promptTurno(texto) {
+  const hist = conversa.msgs.slice(-12).map((m) => (m.r === 'tutor' ? 'TU: ' : 'UTENTE: ') + m.t).join('\n');
+  return `${base()}${erroresRecorrentes()}
+
+Conversazione finora (argomento: ${conversa.assunto}):
+${hist}
+
+Nuovo messaggio dell'utente:
+"""${texto}"""
+
+Compiti:
+1. Rileva la lingua. Se l'utente scrive in ${LANG.nativo}, NON penalizzarlo: in "texto_corrigido" metti come si direbbe in ${LANG.nome} e lascia "correcoes" vuoto.
+2. Correggi il testo dell'utente. Distingui "erro" (errore reale) da "naturalidade" (corretto ma un madrelingua direbbe diversamente; usalo con parsimonia).
+   NON correggere ciò che è corretto. Varianti accettabili, scelte di stile e pronomi soggetto ridondanti non sono errori.
+   Per livello A1-A2 segnala solo gli errori importanti; massimo 3 correzioni.
+3. "explicacao" in ${LANG.nativo}, breve e concreta.
+4. Continua la conversazione in "resposta": commenta ciò che ha detto e rilancia.
+Categorie: ${LANG.categoriasErro.join('; ')}.
+
+Rispondi solo con JSON:
+{"idioma_detectado": "${LANG.code}" | "pt" | "outro",
+ "texto_corrigido": "testo completo corretto (uguale se non ci sono errori)",
+ "correcoes": [{"original": "...", "corrigido": "...", "tipo": "erro" | "naturalidade", "categoria": "...", "explicacao": "..."}],
+ "resposta": "il tuo messaggio in ${LANG.nome}",
+ "vocabulario_novo": [{"termo": "parola nuova della tua risposta, difficile per il livello", "traducao": "..."}]}`;
+}
+function promptExplicar(frase) {
+  return `Sei un insegnante di ${LANG.nome} per un parlante di ${LANG.nativo} di livello ${cefr(perfil.nivel)}. Tutte le spiegazioni in ${LANG.nativo}.
+Spiega tutto ciò che serve per capire questa frase:
+"""${frase}"""
+
+Rispondi solo con JSON:
+{"traducao": "traduzione completa e naturale",
+ "palavras": [{"termo": "...", "traducao": "...", "classe": "substantivo/verbo/..."}],
+ "gramatica": ["punto grammaticale usato, spiegato in 1 frase"],
+ "expressoes": [{"expressao": "...", "significado": "..."}]}`;
+}
+
+async function ask(prompt, { tier } = {}) {
+  if (!sample) throw { code: 'unavailable' };
+  return sample.json(prompt, { modelTier: tier || (perfil.careful ? 'default' : 'quick'), cache: false });
+}
+function errCopy(e) {
+  const c = e?.code;
+  if (c === 'unavailable') return 'Esta página precisa ser aberta no claude.ai para conversar (ela usa o Claude da sua conta).';
+  if (c === 'not_granted') return 'Você não autorizou o uso do Claude nesta página. Recarregue a página e autorize para conversar.';
+  if (c === 'rate_limited' || c === 'queue_overflow') return 'Muitas mensagens em pouco tempo. Espere um minuto e tente de novo.';
+  if (c === 'invalid_json') return 'A resposta veio fora do formato esperado. Tente de novo.';
+  if (c === 'session_expired') return 'Sua sessão do claude.ai expirou. Entre de novo e recarregue a página.';
+  return `Não consegui falar com o Claude agora (${c || 'erro desconhecido'}). Tente de novo.`;
+}
+
+// ===================== Renderização =====================
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+
+function renderLevel() {
+  const t = `${cefr(perfil.nivel)} · ${perfil.nivel.toFixed(1)}`;
+  $('levelChip').textContent = t; $('levelRangeOut').textContent = t; $('levelRange').value = perfil.nivel;
+}
+function vocabRow(list) {
+  const v = el('div', 'vocab');
+  (list || []).forEach((x) => { const s = el('span'); const b = el('b', null, x.termo); s.append(b, ' = ' + x.traducao); v.append(s); });
+  return v;
+}
+function renderExplain(box, d) {
+  box.replaceChildren();
+  const sec = (title, nodes) => { if (!nodes.length) return; const h = el('h3', null, title); const ul = el('ul'); nodes.forEach((n) => ul.append(n)); box.append(h, ul); };
+  box.append(el('h3', null, 'Tradução'), el('div', null, d.traducao || ''));
+  sec('Palavras', (d.palavras || []).map((p) => { const li = el('li'); li.append(el('span', 'it', p.termo), ` (${p.classe || '—'}) = ${p.traducao}`); return li; }));
+  sec('Gramática', (d.gramatica || []).map((g) => el('li', null, g)));
+  sec('Expressões', (d.expressoes || []).map((x) => { const li = el('li'); li.append(el('span', 'it', x.expressao), ': ' + x.significado); return li; }));
+}
+function renderMsg(m, idx) {
+  const w = el('div', 'msg ' + m.r);
+  if (m.r === 'tutor') {
+    if (perfil.preIntro && m.vocab?.length) w.append(vocabRow(m.vocab));
+    w.append(el('div', 'bubble', m.t));
+    const tools = el('div', 'tools');
+    const btn = el('button', 'link', m.exp ? 'Ocultar explicação' : 'Entender esta frase');
+    btn.type = 'button';
+    const box = el('div', 'explain'); box.hidden = !m.exp || !m.expOpen;
+    if (m.exp) renderExplain(box, m.exp);
+    btn.onclick = () => explain(m, btn, box);
+    tools.append(btn);
+    w.append(tools, box);
+    if (!perfil.preIntro && m.vocab?.length) w.append(vocabRow(m.vocab));
+  } else {
+    w.append(el('div', 'bubble', m.t));
+    if (m.corr) w.append(renderCorr(m.corr));
+  }
+  return w;
+}
+function renderCorr(d) {
+  if (d.idioma_detectado === 'pt') {
+    const c = el('div', 'corr'); const it = el('div', 'item nat');
+    it.append(el('div', 'tag', 'Em italiano'), el('div', 'full', d.texto_corrigido || '')); c.append(it); return c;
+  }
+  const list = d.correcoes || [];
+  if (!list.length) return el('div', 'okline', '✓ Sem correções');
+  const c = el('div', 'corr');
+  list.forEach((x) => {
+    const it = el('div', 'item' + (x.tipo === 'naturalidade' ? ' nat' : ''));
+    const l1 = el('div'); l1.append(el('del', null, x.original), ' → ', el('ins', null, x.corrigido), el('span', 'tag', x.tipo === 'naturalidade' ? 'mais natural' : (x.categoria || 'erro')));
+    it.append(l1, el('div', null, x.explicacao || '')); c.append(it);
+  });
+  if (d.texto_corrigido) { const f = el('div', 'item nat'); f.append(el('div', 'tag', 'Frase corrigida'), el('div', 'full', d.texto_corrigido)); c.append(f); }
+  return c;
+}
+function renderThread() {
+  const t = $('thread'); t.replaceChildren();
+  if (!conversa) {
+    const e = el('div', 'empty');
+    e.append(el('p', null, 'Um amigo italiano puxa assunto sobre um tema que te interessa. Você responde como conseguir, e ele corrige e continua a conversa.'));
+    const ex = el('div', 'msg tutor example');
+    ex.append(el('div', 'example-label', 'Exemplo'), el('div', 'bubble', 'Ciao! Sai che nel Colosseo c’erano anche spettacoli con animali esotici? Secondo te, da dove arrivavano?'));
+    const b = el('button', 'primary', 'Começar uma conversa'); b.type = 'button'; b.onclick = () => newConversation();
+    e.append(ex, b); t.append(e); return;
+  }
+  t.append(el('div', 'topic', conversa.assunto));
+  conversa.msgs.forEach((m, i) => t.append(renderMsg(m, i)));
+  scrollEnd();
+}
+function scrollEnd() { requestAnimationFrame(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })); }
+function showThinking(text) { const n = el('div', 'msg tutor'); n.append(el('div', 'bubble thinking', text)); $('thread').append(n); scrollEnd(); return n; }
+function showNotice(text, retry) {
+  const n = el('div', 'notice'); n.append(text + ' ');
+  if (retry) { const b = el('button', 'link', 'Tentar de novo'); b.type = 'button'; b.onclick = () => { n.remove(); retry(); }; n.append(b); }
+  $('thread').append(n); scrollEnd();
+}
+function setBusy(v) { busy = v; ['btnSend', 'btnNew', 'btnEasy', 'btnHard'].forEach((i) => $(i).disabled = v); }
+
+// ===================== Ações =====================
+function pickTopic() {
+  const list = perfil.interesses.length ? perfil.interesses : Object.keys(LANG.assuntos);
+  return list[Math.floor(Math.random() * list.length)];
+}
+async function newConversation() {
+  if (busy) return;
+  setBusy(true);
+  if (conversa?.msgs?.length > 1) store?.set('c_' + conversa.id, conversa); // arquiva a anterior
+  const chave = pickTopic();
+  const th = showThinking(`Pensando num assunto de ${LANG.assuntos[chave].nome.toLowerCase()}…`);
+  try {
+    const d = await ask(promptAbertura(chave));
+    conversa = { id: Date.now().toString(36), area: chave, assunto: d.assunto || LANG.assuntos[chave].nome, msgs: [{ r: 'tutor', t: d.mensagem, vocab: d.vocabulario_previo || [] }] };
+    perfil.assuntosRecentes = [...perfil.assuntosRecentes, conversa.assunto].slice(-20);
+    save.perfil(); save.conversa(); renderThread(); $('input').focus();
+  } catch (e) { th.remove(); showNotice(errCopy(e), newConversation); }
+  finally { setBusy(false); }
+}
+async function send() {
+  const box = $('input'); const texto = box.value.trim();
+  if (!texto || busy) return;
+  if (!conversa) { showNotice('Comece uma conversa primeiro.'); return; }
+  setBusy(true);
+  const m = { r: 'aluno', t: texto }; conversa.msgs.push(m);
+  box.value = ''; autoGrow();
+  $('thread').append(renderMsg(m));
+  const th = showThinking('Lendo e corrigindo…');
+  try {
+    const d = await ask(promptTurno(texto));
+    m.corr = { idioma_detectado: d.idioma_detectado, texto_corrigido: d.texto_corrigido, correcoes: d.correcoes || [] };
+    const nErros = m.corr.correcoes.filter((c) => c.tipo === 'erro');
+    nErros.forEach((c) => { const k = c.categoria || 'outro'; erros.contagem[k] = (erros.contagem[k] || 0) + 1; erros.exemplos[k] = [...(erros.exemplos[k] || []), `${c.original} → ${c.corrigido}`].slice(-5); });
+    // Sinal implícito de nível: move pouco (botões explícitos movem 0.5)
+    if (d.idioma_detectado === 'pt' || nErros.length >= 3) ajustarNivel(-0.1, false);
+    else if (nErros.length === 0 && texto.split(/\s+/).length >= 10) ajustarNivel(+0.1, false);
+    conversa.msgs.push({ r: 'tutor', t: d.resposta, vocab: d.vocabulario_novo || [] });
+    save.conversa(); save.erros(); renderThread();
+  } catch (e) {
+    th.remove(); conversa.msgs.pop(); renderThread(); box.value = texto; autoGrow();
+    showNotice(errCopy(e), send);
+  } finally { setBusy(false); }
+}
+async function explain(m, btn, box) {
+  if (m.exp) { m.expOpen = !box.hidden ? false : true; box.hidden = !m.expOpen; btn.textContent = m.expOpen ? 'Ocultar explicação' : 'Entender esta frase'; return; }
+  btn.disabled = true; btn.textContent = 'Explicando…';
+  try {
+    m.exp = await ask(promptExplicar(m.t), { tier: 'quick' }); m.expOpen = true;
+    renderExplain(box, m.exp); box.hidden = false; btn.textContent = 'Ocultar explicação';
+    ajustarNivel(-0.05, false); save.conversa();
+  } catch (e) { btn.textContent = 'Entender esta frase'; box.hidden = false; box.replaceChildren(el('div', null, errCopy(e))); }
+  finally { btn.disabled = false; }
+}
+function ajustarNivel(delta, explicito) {
+  perfil.nivel = Math.round(Math.min(6, Math.max(1, perfil.nivel + delta)) * 100) / 100;
+  renderLevel(); save.perfil();
+  if (explicito) showNotice(`Nível ajustado para ${cefr(perfil.nivel)} (${perfil.nivel.toFixed(1)}). Vale a partir da próxima mensagem.`);
+}
+function renderErrors() {
+  const body = $('errorsBody'); body.replaceChildren();
+  const top = Object.entries(erros.contagem).sort((a, b) => b[1] - a[1]);
+  if (!top.length) { body.append(el('p', 'hint', 'Ainda não há erros registrados. Eles aparecem aqui conforme você conversa, e o amigo cria oportunidades para você praticar os mais frequentes.')); return; }
+  const t = el('table', 'errtable');
+  top.forEach(([k, v]) => { const tr = el('tr'); const td = el('td'); td.append(el('div', null, k), el('div', 'hint', (erros.exemplos[k] || []).slice(-2).join(' · '))); tr.append(td, el('td', null, String(v))); t.append(tr); });
+  body.append(t);
+}
+function renderSettings() {
+  const box = $('topics'); box.replaceChildren();
+  Object.entries(LANG.assuntos).forEach(([k, a]) => {
+    const l = el('label'); const c = el('input'); c.type = 'checkbox'; c.id = 'topic-' + k; c.checked = perfil.interesses.includes(k);
+    c.onchange = () => { perfil.interesses = c.checked ? [...new Set([...perfil.interesses, k])] : perfil.interesses.filter((x) => x !== k); save.perfil(); };
+    l.append(c, a.nome); box.append(l);
+  });
+  $('preIntro').checked = perfil.preIntro; $('careful').checked = perfil.careful;
+  $('storageNote').textContent = store?.kind === 'db' ? 'Suas configurações e conversas ficam salvas na sua conta (só você vê).' : 'Suas configurações ficam salvas só neste navegador.';
+}
+function autoGrow() { const t = $('input'); t.style.height = 'auto'; t.style.height = Math.min(160, t.scrollHeight) + 'px'; }
+
+$('btnSend').onclick = send;
+$('input').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+$('input').addEventListener('input', autoGrow);
+$('btnNew').onclick = newConversation;
+$('btnEasy').onclick = () => ajustarNivel(+0.5, true);
+$('btnHard').onclick = () => ajustarNivel(-0.5, true);
+$('btnSettings').onclick = () => { renderSettings(); $('errorsPanel').hidden = true; $('settings').hidden = !$('settings').hidden; };
+$('btnCloseSettings').onclick = () => { $('settings').hidden = true; renderThread(); };
+$('btnErrors').onclick = () => { renderErrors(); $('settings').hidden = true; $('errorsPanel').hidden = !$('errorsPanel').hidden; };
+$('btnCloseErrors').onclick = () => { $('errorsPanel').hidden = true; };
+$('levelRange').oninput = (e) => { perfil.nivel = Number(e.target.value); renderLevel(); };
+$('levelRange').onchange = () => save.perfil();
+$('preIntro').onchange = (e) => { perfil.preIntro = e.target.checked; save.perfil(); };
+$('careful').onchange = (e) => { perfil.careful = e.target.checked; save.perfil(); };
+
+renderLevel(); renderThread();
+(async () => {
+  if (window.claude?.use) {
+    sample = await claude.use('sample').catch(() => null);
+    store = await initStore();
+  } else store = localStore();
+  const [p, er, c] = await Promise.all([store.get('perfil'), store.get('erros'), store.get('atual')]);
+  if (p) perfil = { ...DEFAULT_PERFIL, ...p };
+  if (er) erros = { contagem: {}, exemplos: {}, ...er };
+  if (c) conversa = c;
+  renderLevel(); renderThread();
+  if (!sample) showNotice(errCopy({ code: 'unavailable' }));
+})();
+</script>

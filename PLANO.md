@@ -164,6 +164,7 @@ A interface (UI) também deve ser i18n, separando **idioma da interface** (portu
 ## 6. Etapas
 
 ### Etapa 0 — Validação (antes de escrever código do app)
+> Protótipo web sem chaves de API já disponível: ver `prototipo/DECISOES.md`.
 - [ ] Teste cego de correção com 3 provedores (seção 2). Escolher o provedor.
 - [ ] Escrever e iterar o prompt de sistema + schema JSON de saída num script simples.
 - [ ] Testar o fluxo inteiro "na mão" por 1–2 semanas (você mesmo usando o script). Se não for útil para você, não vai ser para ninguém.
